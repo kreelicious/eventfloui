@@ -1,5 +1,6 @@
 import React from 'react'
 import { EnvelopeIcon, PhoneIcon } from '@heroicons/react/20/solid'
+import Link from "next/link";
 
 const events = [
   {
@@ -45,11 +46,13 @@ const EventList = () => {
           key={event.email}
           className="col-span-1 flex flex-col divide-y divide-gray-40 rounded-lg bg-white shadow-md hover:shadow-lg group"
         >
+          <Link href="./event">
           <div className="flex flex-1 flex-col p-4">
             <img className="mx-auto flex-shrink-0 mb-3 " src={event.imageUrl} alt="" />
             <h3 className="text-l text-purple-800 font-bold">{event.title}</h3>
             <span className='text-md'>{event.date}</span>
           </div>
+          </Link>
           
         </li>
       ))}

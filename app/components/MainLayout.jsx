@@ -2,8 +2,17 @@
 
 import React, { Fragment, useState } from "react";
 import {
+  LinkIcon,
+  PlusIcon,
+  QuestionMarkCircleIcon,
+} from "@heroicons/react/20/solid";
+
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import {
   Dialog,
   DialogPanel,
+  DialogTitle,
   Menu,
   MenuButton,
   MenuItem,
@@ -16,15 +25,34 @@ import {
   BellIcon,
   CalendarDaysIcon,
   TicketIcon,
-  FolderIcon,
   HomeIcon,
   UsersIcon,
   XMarkIcon,
+  CheckIcon,
 } from "@heroicons/react/24/outline";
 import {
   ChevronDownIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
+
+const generateTimeOptions = () => {
+  const times = [];
+  const start = 0; // Start at 00:00
+  const end = 24 * 60; // End at 24:00 (1440 minutes)
+  const interval = 30; // 30-minute intervals
+
+  for (let minutes = start; minutes < end; minutes += interval) {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    const time = new Date(0, 0, 0, hours, mins).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    times.push(time);
+  }
+
+  return times;
+};
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon, current: true },
@@ -43,6 +71,17 @@ function classNames(...classes) {
 
 const MainLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [startDate, setStartDate] = useState(new Date());
+  const timeOptions = generateTimeOptions();
+
+  function closePanel() {
+    setPanelOpen(false);
+  }
+
+  function openPanel() {
+    setPanelOpen(true);
+  }
 
   return (
     <>
@@ -202,7 +241,22 @@ const MainLayout = ({ children }) => {
                   name="search"
                 />
               </form>
+
               <div className="flex items-center gap-x-4 lg:gap-x-6">
+                <button
+                  type="button"
+                  onClick={openPanel}
+                  className="rounded-md bg-purple-700 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >
+                  Create Event
+                </button>
+
+                {/* Separator */}
+                <div
+                  className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10"
+                  aria-hidden="true"
+                />
+
                 <button
                   type="button"
                   className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500"
@@ -270,11 +324,257 @@ const MainLayout = ({ children }) => {
             </div>
           </div>
 
-          <main className="py-10">
-            <div className=" px-4 sm:px-6 lg:px-8">{children}</div>
-          </main>
+          <main className="">{children}</main>
         </div>
       </div>
+
+      <Transition appear show={panelOpen} as={Fragment}>
+        <Dialog className="relative z-50" onClose={closePanel}>
+          <div className="fixed inset-0" />
+
+          <div className="fixed inset-0 overflow-hidden">
+            <div className="absolute inset-0 overflow-hidden">
+              <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
+                <TransitionChild
+                  enter="transform transition ease-in-out duration-500 sm:duration-700"
+                  enterFrom="translate-x-full"
+                  enterTo="translate-x-0"
+                  leave="transform transition ease-in-out duration-500 sm:duration-700"
+                  leaveFrom="translate-x-0"
+                  leaveTo="translate-x-full"
+                >
+                  <DialogPanel className="pointer-events-auto w-screen max-w-md">
+                    <form className="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl">
+                      <div className="h-0 flex-1 overflow-y-auto">
+                        <div className="bg-purple-700 px-4 py-6 sm:px-6">
+                          <div className="flex items-center justify-between">
+                            <DialogTitle className="text-base font-semibold leading-6 text-white">
+                              Create Event
+                            </DialogTitle>
+                            <div className="ml-3 flex h-7 items-center">
+                              <button
+                                type="button"
+                                className="relative rounded-md bg-purple-700 text-indigo-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                                onClick={closePanel}
+                              >
+                                <span className="absolute -inset-2.5" />
+                                <span className="sr-only">Close panel</span>
+                                <XMarkIcon
+                                  className="h-6 w-6"
+                                  aria-hidden="true"
+                                />
+                              </button>
+                            </div>
+                          </div>
+                          <div className="mt-1">
+                            <p className="text-sm text-indigo-100">
+                              Great, so you want to book in an event. Just give
+                              it a name, some dates, and a little bit of
+                              information about it and you can add futher
+                              information later on.
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex flex-1 flex-col justify-between">
+                          <div className="divide-y divide-gray-200 px-4 sm:px-6">
+                            <div className="space-y-6 pb-5 pt-6">
+                              <div>
+                                <label
+                                  htmlFor="project-name"
+                                  className="block text-sm font-medium leading-6 text-gray-900"
+                                >
+                                  Event Name
+                                </label>
+                                <div className="mt-2">
+                                  <input
+                                    type="text"
+                                    name="project-name"
+                                    id="project-name"
+                                    className="block w-full rounded-md border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                  />
+                                </div>
+                              </div>
+                              <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
+                                <div className="sm:col-span-3 sm:col-start-1">
+                                  <label
+                                    htmlFor="website"
+                                    className="block text-sm font-medium leading-6 text-gray-900"
+                                  >
+                                    Start Date
+                                  </label>
+                                  <div className="mt-2">
+                                    <DatePicker
+                                      selected={startDate}
+                                      onChange={(date) => setStartDate(date)}
+                                      className="block w-full rounded-md border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                      placeholderText="Event Start Date"
+                                    />
+                                  </div>
+                                </div>
+
+                                <div className="sm:col-span-3">
+                                  <label
+                                    htmlFor="region"
+                                    className="block text-sm font-medium leading-6 text-gray-900"
+                                  >
+                                    Start Time
+                                  </label>
+                                  <div className="mt-2">
+                                    <select
+                                      id="start-time"
+                                      name="start-time"
+                                      className="block w-full rounded-md border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    >
+                                      {timeOptions.map((time, index) => (
+                                        <option key={index} value={time}>
+                                          {time}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
+                                <div className="sm:col-span-3 sm:col-start-1">
+                                  <label
+                                    htmlFor="website"
+                                    className="block text-sm font-medium leading-6 text-gray-900"
+                                  >
+                                    Close Date
+                                  </label>
+                                  <div className="mt-2">
+                                    <DatePicker
+                                      selected={startDate}
+                                      onChange={(date) => setStartDate(date)}
+                                      className="block w-full rounded-md border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                      placeholderText="Event Start Date"
+                                    />
+                                  </div>
+                                </div>
+
+                                <div className="sm:col-span-3">
+                                  <label
+                                    htmlFor="region"
+                                    className="block text-sm font-medium leading-6 text-gray-900"
+                                  >
+                                    Close Time
+                                  </label>
+                                  <div className="mt-2">
+                                    <select
+                                      id="start-time"
+                                      name="start-time"
+                                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    >
+                                      {timeOptions.map((time, index) => (
+                                        <option key={index} value={time}>
+                                          {time}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                                <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
+                                  <div className="sm:col-span-3">
+                                    <label
+                                      htmlFor="first-name"
+                                      className="block text-sm font-medium leading-6 text-gray-900"
+                                    >
+                                      What kind of event is it?
+                                    </label>
+                                    <div className="mt-2">
+                                      <select
+                                        id="category"
+                                        name="category"
+                                        autoComplete="event-category"
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                                      >
+                                        <option>Live Music</option>
+                                        <option>DJ / Recorded Music</option>
+                                        <option>Comedy</option>
+                                        <option>Spoken Word</option>
+                                        <option>Film / Screening</option>
+                                        <option>Private Event</option>
+                                        <option>Other</option>
+                                      </select>
+                                    </div>
+                                  </div>
+
+                                  <div className="sm:col-span-3">
+                                    <label
+                                      htmlFor="last-name"
+                                      className="block text-sm font-medium leading-6 text-gray-900"
+                                    >
+                                      Genre
+                                    </label>
+                                    <div className="mt-2">
+                                      <select
+                                        id="category"
+                                        name="category"
+                                        autoComplete="event-category"
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                                      >
+                                        <option>Rock / Metal</option>
+                                        <option>Indie</option>
+                                        <option>Punk</option>
+                                        <option>Ska / Reggae</option>
+                                        <option>County / Folk</option>
+                                        <option>Soul</option>
+                                        <option>Other</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+                                <h3 className="text-sm font-medium leading-6 text-gray-900">
+                                  Team Members
+                                </h3>
+                                <div className="mt-2">
+                                  <div className="flex space-x-2">
+                                    <button
+                                      type="button"
+                                      className="relative inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-dashed border-gray-200 bg-white text-gray-400 hover:border-gray-300 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                    >
+                                      <span className="absolute -inset-2" />
+                                      <span className="sr-only">
+                                        Add team member
+                                      </span>
+                                      <PlusIcon
+                                        className="h-5 w-5"
+                                        aria-hidden="true"
+                                      />
+                                    </button>
+                                  </div>
+                                </div>
+                              
+                            </div>
+                            
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex flex-shrink-0 justify-end px-4 py-4">
+                        <button
+                          type="button"
+                          className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                          onClick={closePanel}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                        >
+                          Create Event
+                        </button>
+                      </div>
+                    </form>
+                  </DialogPanel>
+                </TransitionChild>
+              </div>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
     </>
   );
 };

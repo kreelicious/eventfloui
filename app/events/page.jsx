@@ -1,5 +1,6 @@
 import React from "react";
 import EventList from "../components/Events/EventList";
+import Link from "next/link";
 
 import {
   Label,
@@ -14,7 +15,8 @@ import { CalendarDaysIcon } from "@heroicons/react/20/solid";
 
 const Events = () => {
   return (
-    <div>
+    <div className="py-10">
+      <div className="px-4 sm:px-6 lg:px-8">
       <div className="border-b border-gray-200 pb-5 sm:flex sm:items-center sm:justify-between">
         <h2 className=" font-semibold leading-6 text-gray-900 text-2xl grow ">
           Events
@@ -34,10 +36,14 @@ const Events = () => {
           </div>
         </div>
         <div className="sm:ml-4 sm:mt0 group">
+          <Link href="/events/calendar">
           <button className="p-2 border-gray-700 rounded-lg bg-white shadow-md group-hover:shadow-l"><CalendarDaysIcon  className="h-5 w-5 text-gray-500 group-hover:text-purple-700" /></button>
+          </Link>
+          
         </div>
       </div>
       <div><EventList></EventList></div>
+    </div>
     </div>
   );
 };
